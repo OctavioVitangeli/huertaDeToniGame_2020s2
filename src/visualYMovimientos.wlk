@@ -1,59 +1,52 @@
 import wollok.game.*
 import plantas.*
-import direcciones.*
 import toni.*
 import pachamama.*
+import mercados.*
+
+const mercadoCentral = new Mercado(oro=1000,position=game.at(13,7),image="mercado.png") 
+const mercadoChino = new Mercado(oro=500,position=game.at(1,7),image="mercado_chino_opt.png")		
+		
 
 object juego {
-	var property personajeActual = toni
 	
 	method configurarTeclado() {
-		
-		// acciones de la pachamama
+/* 		Acciones de la Pachamama */
 		keyboard.f().onPressDo({ pachamama.fumigar() })
-		keyboard.l().onPressDo({ pachamama.llover() })
-		
-			
-		// acciones de toni 
-		keyboard.m().onPressDo({ toni.sembrarMaiz() })
-		keyboard.t().onPressDo({ toni.sembrarTrigo() })
-		keyboard.o().onPressDo({ toni.sembrarTomaco() })
+		keyboard.l().onPressDo({ pachamama.llover() })		
+
+
+/*		Acciones de Toni */		
+		keyboard.m().onPressDo({ toni.sembrarPlanta(new Maiz(position=toni.position())) })
+		keyboard.t().onPressDo({ toni.sembrarPlanta(new Trigo(position=toni.position())) })
+		keyboard.o().onPressDo({ toni.sembrarPlanta(new Tomaco(position=toni.position())) })
 		keyboard.c().onPressDo({ toni.cosecharPlanta() })
 		keyboard.x().onPressDo({ toni.cosecharTodo() })
 		keyboard.r().onPressDo({ toni.regarPlanta() })
 		keyboard.a().onPressDo({ toni.regarLasPlantas() })
-		keyboard.v().onPressDo({ toni.venderCosecha() })
+		keyboard.v().onPressDo({ toni.venderEnMercado() })
 		keyboard.space().onPressDo({
-			game.say(toni,"tengo" + toni.oroObtenido() + " de oro obtenido" + 
-			"y me quedan" + toni.plantasCosechadas().size() + "para vender")
+			game.say(toni,"Tengo " + toni.oroObtenido().toString() + " de oro " + 
+			" y quedan " + toni.plantasCosechadas().size().toString() + " plantas por vender")
 		})
-		self.configurarMovimiento()
+		keyboard.control().onPressDo({ game.say(toni,"Valor de mi cosecha: " + toni.valorCosecha().toString() ) } )
+	
+/*		Movimientos de Toni  */  		
+		keyboard.up().onPressDo({toni.moverseHaciaArriba()})
+		keyboard.down().onPressDo({toni.moverseHaciaAbajo()})
+		keyboard.left().onPressDo({toni.moverseHaciaLaIzquierda()})
+		keyboard.right().onPressDo({toni.moverseHaciaLaDerecha()})
 		
 	}
 	
-	method configurarMovimiento(){
-		keyboard.up().onPressDo({
-			if(personajeActual.position().y() < game.height() - 1){
-				personajeActual.position(personajeActual.position().up(1))
-			}
-		})
-		keyboard.down().onPressDo({
-			if(personajeActual.position().y() > 0){
-				personajeActual.position(personajeActual.position().down(1))
-			}
-		})
-		keyboard.left().onPressDo({
-			if(personajeActual.position().x() > 0){
-				personajeActual.position(personajeActual.position().left(1))
-			}
-		})
-		keyboard.right().onPressDo({
-			if(personajeActual.position().x() < game.width() - 1){
-				personajeActual.position(personajeActual.position().right(1))
-			}
-		})
-	}
+	
 	method configurarPersonajes(){
+
 		game.addVisual(toni)
+		game.addVisual(pachamama)
+		game.addVisual(mercadoCentral)
+		game.addVisual(mercadoChino)
 	}	
+	
+	
 }

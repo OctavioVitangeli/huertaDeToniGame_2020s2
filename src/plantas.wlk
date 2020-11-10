@@ -1,22 +1,39 @@
 import wollok.game.*
 import pachamama.*
+import toni.*
 
-class Maiz {
+class Plantas {
 	var property position
-	var property esAdulta = false
-	const property esAptoCeliaco = true
 	
-	method image() {
-		if (esAdulta) {
-			return "maiz_adulto.png"
-		} 
-		else {
-			return "maiz_bebe.png"
-		}	
+	method serOfrenda() {
+		game.removeVisual(self) 
+		toni.plantasSembradas().remove(self)
 	}
 	
-	method cuantoOroDa() = if (pachamama.estaAgradecida()){ 180}
-							else { 150}
+	method cosechate() { 
+		toni.position(self.position())
+		game.removeVisual(self) 
+		toni.plantasCosechadas().add(self) 
+		toni.plantasSembradas().remove(self)
+	}
+	
+	method esAptoCeliaco() = true
+}
+
+
+class Maiz inherits Plantas {
+	var property esAdulta = false
+	
+	method image() {
+		return if (esAdulta and pachamama.estaAgradecida()) { "maiz_gigante_opt.png" } 
+		else if (esAdulta) { "maiz_adulto.png" }
+		else { "maiz_bebe.png" }
+			
+	}
+	
+	method cuantoOroDa() { return if(pachamama.estaAgradecida()) { 180 }
+								  else { 150 }
+	}
 		
 	method regar() {
 		if (not esAdulta) {esAdulta=true}
@@ -24,14 +41,13 @@ class Maiz {
 	
 	method listaParaCosechar() { return esAdulta }
 	
-	method cosechate() { game.removeVisual(self) }
-	
+
 }
 
-class Trigo {
-	var property position
+class Trigo inherits Plantas {
 	var property etapa = 0
-	const property esAptoCeliaco = false
+	
+	override method esAptoCeliaco() = false
 	
 	method image() {
 	
@@ -49,34 +65,24 @@ class Trigo {
 	}
 	
 	method regar() {
-		if( pachamama.estaAgradecida()){etapa += 2}
-		else if (etapa.between(0,2)) { etapa += 1}
-		else  { etapa=0 }
+		if (pachamama.estaAgradecida()) { etapa = (etapa + 2).rem(4) }
+		else { etapa = (etapa + 1).rem(4) }	
 	}
 	
 	method listaParaCosechar() { return etapa >= 2 }
 	
-	method cosechate() { game.removeVisual(self) }
 	
 }
 
-class Tomaco {
-	var property position
-	const property esAptoCeliaco = true
+class Tomaco inherits Plantas {
 	
-	method image() {
-		return if( pachamama.estaAgradecida()){ "tomaco_podrido.png"}
-				else{ "tomaco_ok.png"}
+	method image() { 
+		return if (pachamama.estaAgradecida()) { "tomaco_podrido.png" }
+		else { "tomaco_ok.png" }			
 	}
 	
 	method cuantoOroDa(){ return 80 }
-	
 	method regar() { }
-	
-	method listaParaCosechar() = self.image() == "tomaco_ok.png"
-	
-	method cosechate() { game.removeVisual(self) }	
+	method listaParaCosechar() { return not pachamama.estaAgradecida() }
 }
 
-
-// Agregar las demás plantas y completar el Maiz.

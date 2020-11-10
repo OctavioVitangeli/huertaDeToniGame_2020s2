@@ -1,17 +1,21 @@
-import plantas.*
-import toni.*
 import wollok.game.*
-object mercado{
-	const property image = "mercado.png"
-	var property position = game.at(5,13)
+import toni.*
+
+
+class Mercado {
+	var property image
+	var property position
+	var property oro
 	var property mercaderia = []
-	var property oro = 200
-	
-	method venderMercaderia(){ 
+		
+	method aceptarCompra(){ 
+		if(oro >= toni.valorCosecha()) {
 		oro -= toni.valorCosecha()
-		mercaderia.add(toni.plantasCosechadas())
+		game.say(self,"Compra realizada valor " + toni.valorCosecha().toString())
+		mercaderia.addAll(toni.plantasCosechadas())
+		toni.venderCosecha()
 	}
-
-
-}
-
+	else { self.error("no puedo cubrir esa venta") }
+	}
+}	
+	
